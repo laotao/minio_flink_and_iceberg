@@ -2,10 +2,22 @@
 
 Use the docker-compose.yml file to create a MariaDB database and an Apache Flink Job and Task manager to work with.
 
-Make sure to add your AWS credentials to the docker-compose.yml file first, so that it will be able to write to s3.
+通过docker部署
 
 ```
 docker compose up -d
+```
+
+通过k8s部署
+docker build -t your-docker-repo/flink-custom:1.18.0 .
+docker push your-docker-repo/flink-custom:1.18.0
+
+kubectl apply -f conf-k8s/mariadb.yaml
+kubectl apply -f conf-k8s/minio.yaml
+kubectl apply -f conf-k8s/flink-configmap.yaml
+kubectl apply -f conf-k8s/flink-deployment.yaml
+```
+
 ```
 
 Once the containers are running, submit the job to Flink using:

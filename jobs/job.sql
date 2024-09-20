@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS my_products (
     'format-version'='2'
 );
 
-create temporary table products (
+CREATE TEMPORARY TABLE products (
     id INT,
     name VARCHAR,
     price DECIMAL(10, 2),
@@ -39,4 +39,4 @@ create temporary table products (
 
 SET 'execution.checkpointing.interval' = '60 s';
 
-INSERT INTO my_products (id,name,price) SELECT id, name,price FROM products;
+INSERT INTO my_products (id, name, price) SELECT id, name, price FROM products;

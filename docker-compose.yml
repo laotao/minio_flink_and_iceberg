@@ -11,13 +11,27 @@ services:
     ports:
       - "3306:3306"
 
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    deploy:
+      restart_policy:
+        condition: on-failure
+
   jobmanager:
     image: flink:1.18.0
     container_name: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-      - AWS_ACCESS_KEY_ID=
-      - AWS_SECRET_ACCESS_KEY=
+      - HADOOP_CONF_DIR=/opt/flink/conf
     ports:
       - "8081:8081"
     command: jobmanager
@@ -27,18 +41,19 @@ services:
       - ./jars/flink-shaded-hadoop-2-uber-2.8.3-10.0.jar:/opt/flink/lib/flink-shaded-hadoop-2-uber-2.8.3-10.0.jar
       - ./jars/flink-s3-fs-hadoop-1.17.1.jar:/opt/flink/lib/flink-s3-fs-hadoop-1.17.1.jar
       - ./jars/iceberg-flink-runtime-1.17-1.4.2.jar:/opt/flink/lib/iceberg-flink-runtime-1.17-1.4.2.jar
-      - ./jars/hadoop-mapreduce-client-core-3.3.4.jar:/opt/flink/lib/hadoop-mapreduce-client-core-3-3.4.jar
+      - ./jars/hadoop-mapreduce-client-core-3.3.4.jar:/opt/flink/lib/hadoop-mapreduce-client-core-3.3.4.jar
       - ./jars/hadoop-hdfs-client-3.2.1.jar:/opt/flink/lib/hadoop-hdfs-client-3.2.1.jar
       - ./jars/hadoop-aws-3.3.4.jar:/opt/flink/lib/hadoop-aws-3.3.4.jar
       - ./jobs/job.sql:/opt/flink/job.sql
+      - ./conf:/opt/flink/conf
     deploy:
-          replicas: 1
+      replicas: 1
+
   taskmanager:
     image: flink:1.18.0
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-      - AWS_ACCESS_KEY_ID=
-      - AWS_SECRET_ACCESS_KEY=
+      - HADOOP_CONF_DIR=/opt/flink/conf
     depends_on:
       - jobmanager
     command: taskmanager
@@ -48,8 +63,12 @@ services:
       - ./jars/flink-shaded-hadoop-2-uber-2.8.3-10.0.jar:/opt/flink/lib/flink-shaded-hadoop-2-uber-2.8.3-10.0.jar
       - ./jars/flink-s3-fs-hadoop-1.17.1.jar:/opt/flink/lib/flink-s3-fs-hadoop-1.17.1.jar
       - ./jars/iceberg-flink-runtime-1.17-1.4.2.jar:/opt/flink/lib/iceberg-flink-runtime-1.17-1.4.2.jar
-      - ./jars/hadoop-mapreduce-client-core-3.3.4.jar:/opt/flink/lib/hadoop-mapreduce-client-core-3-3.4.jar
+      - ./jars/hadoop-mapreduce-client-core-3.3.4.jar:/opt/flink/lib/hadoop-mapreduce-client-core-3.3.4.jar
       - ./jars/hadoop-hdfs-client-3.2.1.jar:/opt/flink/lib/hadoop-hdfs-client-3.2.1.jar
       - ./jars/hadoop-aws-3.3.4.jar:/opt/flink/lib/hadoop-aws-3.3.4.jar
+      - ./conf:/opt/flink/conf
     deploy:
-          replicas: 2
+      replicas: 1
+
+volumes:
+  minio-data:

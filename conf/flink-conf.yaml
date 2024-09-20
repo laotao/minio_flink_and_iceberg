@@ -1,0 +1,14 @@
+fs.s3a.endpoint: http://minio:9000
+fs.s3a.access.key: minioadmin
+fs.s3a.secret.key: minioadmin
+fs.s3a.path.style.access: truejobmanager.rpc.address: jobmanager
+blob.server.port: 6124
+query.server.port: 6125
+jobmanager.rpc.address: jobmanager
+taskmanager.memory.task.heap.size: 1g
+taskmanager.memory.managed.size: 512m
+taskmanager.memory.flink.size: 2g
+taskmanager.memory.process.size: 3g
+jobmanager.memory.heap.size: 1g
+jobmanager.memory.flink.size: 2g
+jobmanager.memory.process.size: 3g

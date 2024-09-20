@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      role: jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        role: jobmanager
+    spec:
+      containers:
+        - name: jobmanager
+          image: 192.168.1.101:5001/flink-custom:1.18.0
+          args: ["jobmanager"]
+          env:
+            - name: JOB_MANAGER_RPC_ADDRESS
+              value: flink-jobmanager
+            - name: HADOOP_CONF_DIR
+              value: /opt/flink/conf
+          ports:
+            - containerPort: 6123  # RPC
+            - containerPort: 8081  # REST
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: flink-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-taskmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      role: taskmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        role: taskmanager
+    spec:
+      containers:
+        - name: taskmanager
+          image: 192.168.1.101:5001/flink-custom:1.18.0
+          args: ["taskmanager"]
+          env:
+            - name: JOB_MANAGER_RPC_ADDRESS
+              value: flink-jobmanager
+            - name: HADOOP_CONF_DIR
+              value: /opt/flink/conf
+          ports:
+            - containerPort: 6121  # Data port
+            - containerPort: 6122  # Data port (UDP)
+            - containerPort: 6123  # RPC
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: flink-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flink-jobmanager
+spec:
+  selector:
+    app: flink
+    role: jobmanager
+  ports:
+    - name: rpc
+      port: 6123
+      targetPort: 6123
+    - name: rest
+      port: 8081
+      targetPort: 8081
+  type: LoadBalancer

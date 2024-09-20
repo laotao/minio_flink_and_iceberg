@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-config
+data:
+  flink-conf.yaml: |
+    jobmanager.rpc.address: flink-jobmanager
+    jobmanager.memory.heap.size: 1024m
+    taskmanager.memory.flink.size: 1024m
+    taskmanager.numberOfTaskSlots: 1
+    parallelism.default: 1
+    rest.port: 8081
+    state.savepoints.dir: s3a://my-test-bucket/savepoints
+    execution.checkpointing.interval: 60s
+  core-site.xml: |
+    <configuration>
+      <property>
+        <name>fs.s3a.endpoint</name>
+        <value>http://minio:9000</value>
+      </property>
+      <property>
+        <name>fs.s3a.access.key</name>
+        <value>minioadmin</value>
+      </property>
+      <property>
+        <name>fs.s3a.secret.key</name>
+        <value>minioadmin</value>
+      </property>
+      <property>
+        <name>fs.s3a.path.style.access</name>
+        <value>true</value>
+      </property>
+      <property>
+        <name>fs.s3a.connection.ssl.enabled</name>
+        <value>false</value>
+      </property>
+    </configuration>

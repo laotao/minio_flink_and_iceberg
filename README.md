@@ -9,6 +9,8 @@ docker compose up -d
 ```
 
 通过k8s部署
+
+```
 docker build -t your-docker-repo/flink-custom:1.18.0 .
 docker push your-docker-repo/flink-custom:1.18.0
 
@@ -16,8 +18,6 @@ kubectl apply -f conf-k8s/mariadb.yaml
 kubectl apply -f conf-k8s/minio.yaml
 kubectl apply -f conf-k8s/flink-configmap.yaml
 kubectl apply -f conf-k8s/flink-deployment.yaml
-```
-
 ```
 
 Once the containers are running, submit the job to Flink using:

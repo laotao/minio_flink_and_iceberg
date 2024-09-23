@@ -30,18 +30,18 @@ spec:
   feSpec:
     replicas: 1
     limits:
-      cpu: 4
-      memory: 4Gi
-    requests:
       cpu: 2
       memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
     image: selectdb/doris.fe-ubuntu:2.1.1
   beSpec:
     replicas: 1
     limits:
-      cpu: 4
-      memory: 4Gi
-    requests:
       cpu: 2
       memory: 2Gi
+    requests:
+      cpu: 1
+      memory: 1Gi
     image: selectdb/doris.be-ubuntu:2.1.1

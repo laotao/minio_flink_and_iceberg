@@ -86,5 +86,5 @@ spec:
     - name: rest
       port: 8081
       targetPort: 8081
-      nodePort: 38081  # Specify a port in the NodePort range
+      nodePort: 30081  # Specify a port in the NodePort range
   type: NodePort

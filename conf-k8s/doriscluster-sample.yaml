@@ -33,7 +33,7 @@ spec:
       cpu: 1
       memory: 1Gi
     requests:
-      cpu: 1
+      cpu: 0.5
       memory: 0.5Gi
     image: selectdb/doris.fe-ubuntu:2.1.1
   beSpec:
@@ -42,6 +42,6 @@ spec:
       cpu: 1
       memory: 1Gi
     requests:
-      cpu: 1
+      cpu: 0.5
       memory: 0.5Gi
     image: selectdb/doris.be-ubuntu:2.1.1

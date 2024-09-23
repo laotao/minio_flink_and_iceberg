@@ -31,17 +31,17 @@ spec:
     replicas: 1
     limits:
       cpu: 1
-      memory: 1Gi
+      memory: 0.5Gi
     requests:
-      cpu: 0.5
+      cpu: 1
       memory: 0.5Gi
     image: selectdb/doris.fe-ubuntu:2.1.1
   beSpec:
     replicas: 1
     limits:
       cpu: 1
-      memory: 1Gi
+      memory: 0.5Gi
     requests:
-      cpu: 0.5
+      cpu: 1
       memory: 0.5Gi
     image: selectdb/doris.be-ubuntu:2.1.1

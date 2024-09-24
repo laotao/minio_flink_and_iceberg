@@ -1,24 +1,13 @@
-# Trying out Apache Iceberg with Apache Flink using Docker Compose
+# 通过Docker Compose和k8s部署Minio + Flink + Iceberg
 
-Use the docker-compose.yml file to create a MariaDB database and an Apache Flink Job and Task manager to work with.
+Use the docker-compose.yml file to create a MinIO and a MariaDB database and an Apache Flink Job and Task manager to work with.
 
-通过docker部署
+## 通过docker部署
 
 ```
 docker compose up -d
 ```
 
-通过k8s部署
-
-```
-docker build -t your-docker-repo/flink-custom:1.18.0 .
-docker push your-docker-repo/flink-custom:1.18.0
-
-kubectl apply -f conf-k8s/mariadb.yaml
-kubectl apply -f conf-k8s/minio.yaml
-kubectl apply -f conf-k8s/flink-configmap.yaml
-kubectl apply -f conf-k8s/flink-deployment.yaml
-```
 
 Once the containers are running, submit the job to Flink using:
 
@@ -30,41 +19,25 @@ If you open your browser to `http://localhost:8081` you'll see the Flink UI with
 
 ![Flink UI](flink.png)
 
-The data in s3 will be in a folder named after the database, in Parquet format.
+The data in MinIO will be in a folder named after the database, in Parquet format.
 
-![s3 folder structure](s3.png)
+![MinIO folder structure](minio.png)
 
-You can use the AWS CLI to verfiy the data is there:
 
+## 通过k8s部署
+* 先将jar打包到docker镜像
 ```
-aws s3 ls s3://my-test-bucket/iceberg/my_database/my_products/data/
+docker build -t your-docker-repo/flink-custom:1.18.0 .
+docker push your-docker-repo/flink-custom:1.18.0
 ```
+* 修改配置文件
 
-If you happen to use DuckDB, you can query the resulting parquet file on s3 to verify the data:
+将conf-k8s/flink-deployment.yaml中的your-docker-repo替换成自己的镜像仓库地址
 
-Assuming duckdb is installed, provide it with AWS details:
-
+* 依次部署mariadb, minio和flink（含iceberg）
 ```
-SET s3_region='us-east-1';
-SET s3_access_key_id='AKAIXXXXXXXXXXXX';
-SET s3_secret_access_key='XXXXXXXXXXXX';
-```
-
-Then you can query one or more parquet files using:
-
-```
-SELECT * FROM 's3://my-test-bucket/iceberg/my_database/my_products/data/00000-0-b3a04103-6ef1-49fa-9c7b-62194183c3fd-00001.parquet';
-```
-
-You should see an output just like the following table
-
-```
-┌───────┬───────────┬───────────────┐
-│  id   │   name    │     price     │
-│ int32 │  varchar  │ decimal(10,2) │
-├───────┼───────────┼───────────────┤
-│     3 │ Product C │         39.99 │
-│     2 │ Product B │         29.99 │
-│     1 │ Product A │         19.99 │
-└───────┴───────────┴───────────────┘
+kubectl apply -f conf-k8s/mariadb.yaml
+kubectl apply -f conf-k8s/minio.yaml
+kubectl apply -f conf-k8s/flink-configmap.yaml
+kubectl apply -f conf-k8s/flink-deployment.yaml
 ```
